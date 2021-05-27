@@ -54,19 +54,110 @@
     <button>Console Trace</button>
     <button>Trigger a Global Error</button>
   </section>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "3b8b2a182d0d45c18470789b199d6622"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
 
   <script>
+    //Class for my custom error where we divide by 0
+    class DivideByZero extends Error{
+      constructor(message){
+        super(message);
+        this.name = "DivideByZero";
+      }
+    }
     let calculateBtn = document.querySelector('#calculate');
     calculateBtn.addEventListener('click', () => {
       let output = document.querySelector('output');
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      var outputOfTryCatch;
+      var canContinue;
+      //Using try catch and finally block to catch when the inuts are not numbers
+      try{
+        if(firstNum == "") throw "First input is not a number";
+        if(secondNum == "") throw "Second input is not a number";
+        outputOfTryCatch = "Both inputs are numbers";
+        canContinue = true;
+      } catch(err){
+        outputOfTryCatch = "ERROR: BAD INPUT or INPUTS";
+        canContinue = false;
+        console.error(err);
+      } finally{
+        console.log(outputOfTryCatch);
+      }
+      //Demonstrating custom error
+      if(canContinue){
+        if(operator == '/' && secondNum == '0'){
+          throw new DivideByZero("Cannot divide by zero");
+        }
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
     // TODO - Make buttons functional
+
+    errorBtns[0].addEventListener('click', () => {
+      let firstNum = document.querySelector('#first-num');
+      let secondNum = document.querySelector('#second-num');
+      let operator = document.querySelector('#operator').value;
+      console.log('The inputs are firstNum, ' + firstNum.value + ", secondNum, " + secondNum.value + ", operator, " + operator);
+    });
+    errorBtns[1].addEventListener('click', () => {
+      console.error('This is not possible to calculate');
+    });
+    errorBtns[2].addEventListener('click', () => {
+      
+      console.dir(document.body.querySelector('output').childNodes);
+    });
+    errorBtns[3].addEventListener('click', () => {
+      
+      console.dirxml(document.body);
+    });
+    errorBtns[4].addEventListener('click', () => {
+      
+      console.group('Start Grouping');
+    });
+    errorBtns[5].addEventListener('click', () => {
+      
+      console.groupEnd();
+    });
+    errorBtns[6].addEventListener('click', () => {
+      let array = [{
+        firstnum: document.querySelector('#first-num').value,
+        operator: document.querySelector('#operator').value,
+        secondnum: document.querySelector('#second-num').value,
+      }
+      ];
+      console.table(array);
+    });
+    errorBtns[7].addEventListener('click', () => {
+      console.time('Timer to perform a task');
+    });
+    errorBtns[8].addEventListener('click', () => {
+      console.timeEnd('Timer to perform a task');
+    });
+    errorBtns[9].addEventListener('click', () => {
+      console.trace(calculateBtn);
+    })
+    errorBtns[10].addEventListener('click', () => {
+      console.log('Sadly, an error has occurred');
+      let firstNum = '6a';
+      let secondNum = 'ç';
+      let operator = '/';
+      eval(`${firstNum} ${operator} ${secondNum}`);
+      window.onerror = function (msg, url, lineNo, columnNo, error){
+        alert("There has been an error: " + msg);
+        return false;
+      }
+
+    });
   </script>
 </body>
 </html>
